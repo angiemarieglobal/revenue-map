@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en-AU">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<!-- AMG Launch Revenue Map v1.1, 25 Sep 2026 -->
+<!-- AMG Launch Revenue Map v1.5, 25 Sep 2026. USD throughout, typing fix, click selects cell -->
 <title>Launch Revenue Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -85,8 +85,8 @@ tr.grp td{background:var(--surface-2);font-size:12px;font-weight:600;letter-spac
 tr.grp td:first-child{background:var(--surface-2)}
 tr.foot td{font-weight:600;background:var(--surface)}
 tr.foot.first td{border-top:2px solid var(--ink)}
-td input.u{width:58px;text-align:right;padding:4px 6px}
-td input.g{width:92px;text-align:right;padding:4px 6px}
+td input.u{width:74px;text-align:right;padding:4px 6px}
+td input.g{width:104px;text-align:right;padding:4px 6px}
 .mh{display:grid;gap:2px;justify-items:end}
 .mh b{color:var(--ink);font-size:13px}
 .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:1px 5px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
@@ -121,7 +121,7 @@ textarea{width:100%;min-height:90px;font-size:12px;font-family:ui-monospace,Menl
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">Angie Marie Global · Money plan</div>
+    <div class="eyebrow">Angie Marie Global · Money plan · All figures in USD</div>
     <h1>Launch Revenue Map</h1>
     <p class="lede">Start with the number. Walk it back to the sale. Set the goal for each month, place your offers, and see exactly how many of each it takes to land it, plus how many people need to come through the door first.</p>
   </header>
@@ -145,12 +145,12 @@ textarea{width:100%;min-height:90px;font-size:12px;font-family:ui-monospace,Menl
   <section class="panel" data-panel="plan">
     <div class="card">
       <div class="row">
-        <div class="field"><label for="annual">Year goal (AUD)</label><input id="annual" type="number" min="0" step="1000" style="width:150px"></div>
+        <div class="field"><label for="annual">Year goal (USD)</label><input id="annual" type="number" min="0" step="1000" style="width:150px"></div>
         <div class="field"><label for="start">Plan starts</label><select id="start"></select></div>
         <button class="btn" id="spreadEven">Spread evenly</button>
         <button class="btn" id="spreadLaunch">Weight to launch months</button>
       </div>
-      <p class="small muted" style="margin:0">Spreading writes the year goal into the Goal row below. You can then type any month's goal directly. Launch weighting gives launch months one and a half shares and retreat months half a share.</p>
+      <p class="small muted" style="margin:0">Spreading writes the year goal into the Goal row below. You can then type any month's goal directly. Launch weighting gives launch months one and a half shares.</p>
     </div>
 
     <div class="card">
@@ -257,10 +257,9 @@ const CAL={
   '2026-12':[['Capacity',1]],
   '2027-01':[['Mirror R1',1]],
   '2027-02':[['Hold',1]],
-  '2027-04':[['Retreat',0],['Encompassed opens',1]],
+  '2027-03':[['Encompassed opens',1]],
   '2027-05':[['Sovereign',1]],
   '2027-07':[['Mirror R2 TBC',1]],
-  '2027-09':[['Retreat',0]],
   '2027-11':[['Mirror R3 TBC',1]]
 };
 const N=12;
@@ -301,17 +300,17 @@ function starter(){
   put('baseA', [ 1,  1,  2,  1,  2,  2,  1,  2,  3,  2,  2,  2]);
   put('baseM', [ 3,  4,  6,  4,  6,  5,  4,  7,  6,  5,  5,  5]);
   put('mirror',[ 2,  2,  4,  0,  0,  0,  0,  2,  3,  0,  0,  0]);
-  put('heldP', [ 0,  0,  0,  0,  0,  0,  1,  0,  1,  0,  1,  0]);
-  put('heldPl',[ 0,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1]);
+  put('heldP', [ 0,  0,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0]);
+  put('heldPl',[ 0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1,  0]);
   distribute(s,'launch');
   return s;
 }
 
 function monthKeys(s){const out=[];for(let i=0;i<N;i++){const d=new Date(s.startY,s.startM+i,1);out.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));}return out;}
-function monthLabel(k,long){const [y,m]=k.split('-').map(Number);const d=new Date(y,m-1,1);return d.toLocaleString('en-AU',{month:long?'long':'short'})+(long?' '+y:' '+String(y).slice(2));}
+function monthLabel(k,long){const [y,m]=k.split('-').map(Number);const d=new Date(y,m-1,1);return d.toLocaleString('en-US',{month:long?'long':'short'})+(long?' '+y:' '+String(y).slice(2));}
 function distribute(s,mode){
   const ks=monthKeys(s);
-  const w=ks.map(k=>{if(mode!=='launch')return 1;const t=CAL[k];if(!t)return 1;if(t.some(x=>x[0]==='Retreat'))return .5;return 1.5;});
+  const w=ks.map(k=>{if(mode!=='launch')return 1;return CAL[k]?1.5:1;});
   const tot=w.reduce((a,b)=>a+b,0);let run=0;
   ks.forEach((k,i)=>{let v=Math.round(s.annual*w[i]/tot/100)*100;if(i===N-1)v=s.annual-run;run+=v;s.goals[k]=v;});
 }
@@ -322,9 +321,9 @@ if(!S||!S.offers)S=starter();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 const $=s=>document.querySelector(s);
-const fmt=v=>'$'+Math.round(v).toLocaleString('en-AU');
+const fmt=v=>'$'+Math.round(v).toLocaleString('en-US');
 const fmtK=v=>{const a=Math.abs(v);if(a>=1e6)return '$'+(v/1e6).toFixed(a>=1e7?1:2).replace(/\.0+$/,'')+'M';if(a>=1e3)return '$'+Math.round(v/1e3)+'K';return '$'+Math.round(v);};
-const n0=v=>Math.round(v).toLocaleString('en-AU');
+const n0=v=>Math.round(v).toLocaleString('en-US');
 const gcol=id=>{const g=GROUPS.find(x=>x.id===id)||GROUPS[5];return 'var('+g.c+')';};
 const units=(id,k)=>+((S.units[id]||{})[k]||0);
 function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -477,14 +476,14 @@ function renderGrid(R){
     list.forEach(o=>{
       const tot=ks.reduce((a,k)=>a+units(o.id,k),0);const cash=R.byOffer[o.id].reduce((a,b)=>a+b,0);
       const pl=o.kind==='plan'?`${fmt(o.deposit)} + ${o.inst}×${fmt(o.instAmt)}`:o.kind==='monthly'?`${fmt(o.price)}/mo`:fmt(o.price);
-      h+=`<tr><td>${esc(o.name)}<span class="price">${pl}</span></td>`+ks.map(k=>`<td><input class="u" type="number" min="0" step="1" inputmode="numeric" id="u-${o.id}-${k}" data-o="${o.id}" data-k="${k}" value="${units(o.id,k)||''}" placeholder="0" aria-label="${esc(o.name)} sales in ${monthLabel(k,true)}"></td>`).join('')+`<td>${n0(tot)}</td><td>${fmt(R.conByOffer[o.id].reduce((a,b)=>a+b,0))}</td><td>${fmt(cash)}</td></tr>`;
+      h+=`<tr><td>${esc(o.name)}<span class="price">${pl}</span></td>`+ks.map(k=>`<td><input class="u" type="number" min="0" step="1" inputmode="numeric" id="u-${o.id}-${k}" data-o="${o.id}" data-k="${k}" value="${units(o.id,k)||''}" placeholder="0" aria-label="${esc(o.name)} sales in ${monthLabel(k,true)}"></td>`).join('')+`<td id="rt-${o.id}">${n0(tot)}</td><td id="rc-${o.id}">${fmt(R.conByOffer[o.id].reduce((a,b)=>a+b,0))}</td><td id="rk-${o.id}">${fmt(cash)}</td></tr>`;
     });
   });
   h+='</tbody><tfoot>';
-  h+=`<tr class="foot first"><td>Contracts signed</td>${R.contract.map(v=>`<td>${fmt(v)}</td>`).join('')}<td></td><td>${fmt(R.sumContract)}</td><td></td></tr>`;
-  h+=`<tr class="foot"><td>Cash received</td>${R.total.map(v=>`<td>${fmt(v)}</td>`).join('')}<td></td><td></td><td>${fmt(R.sumCash)}</td></tr>`;
-  h+=`<tr class="foot"><td>Goal</td>${ks.map(k=>`<td><input class="g" type="number" min="0" step="500" id="g-${k}" data-k="${k}" value="${+S.goals[k]||0}" aria-label="Goal for ${monthLabel(k,true)}"></td>`).join('')}<td></td><td></td><td>${fmt(R.sumGoal)}</td></tr>`;
-  h+=`<tr class="foot"><td>Gap or surplus <span class="price">on ${S.basis==='contract'?'contracts':'cash'}</span></td>${R.basis.map((v,i)=>{const d=v-R.goals[i];const p=R.goals[i]?v/R.goals[i]:1;const c=p>=1?'good':p>=.75?'warn':'bad';return `<td><span class="chip ${c}">${d>=0?'+':'−'}${fmtK(Math.abs(d)).replace('$','$')}</span></td>`;}).join('')}<td></td><td></td><td><span class="chip ${R.sumBasis>=R.sumGoal?'good':'bad'}">${R.sumBasis>=R.sumGoal?'+':'−'}${fmtK(Math.abs(R.sumBasis-R.sumGoal))}</span></td></tr>`;
+  h+=`<tr class="foot first"><td>Contracts signed</td>${R.contract.map((v,i)=>`<td id="fc-${i}">${fmt(v)}</td>`).join('')}<td></td><td id="fcT">${fmt(R.sumContract)}</td><td></td></tr>`;
+  h+=`<tr class="foot"><td>Cash received</td>${R.total.map((v,i)=>`<td id="fk-${i}">${fmt(v)}</td>`).join('')}<td></td><td></td><td id="fkT">${fmt(R.sumCash)}</td></tr>`;
+  h+=`<tr class="foot"><td>Goal</td>${ks.map(k=>`<td><input class="g" type="number" min="0" step="500" id="g-${k}" data-k="${k}" value="${+S.goals[k]||0}" aria-label="Goal for ${monthLabel(k,true)}"></td>`).join('')}<td></td><td></td><td id="fgoalT">${fmt(R.sumGoal)}</td></tr>`;
+  h+=`<tr class="foot"><td>Gap or surplus <span class="price">on ${S.basis==='contract'?'contracts':'cash'}</span></td>${R.basis.map((v,i)=>`<td id="fg-${i}">${gapChip(v,R.goals[i])}</td>`).join('')}<td></td><td></td><td id="fgT"><span class="chip ${R.sumBasis>=R.sumGoal?'good':'bad'}">${R.sumBasis>=R.sumGoal?'+':'−'}${fmtK(Math.abs(R.sumBasis-R.sumGoal))}</span></td></tr>`;
   h+='</tfoot>';
   $('#grid').innerHTML=h;
 }
@@ -539,7 +538,7 @@ function renderOffers(){
 
 function renderStart(){
   const opts=[];for(let i=0;i<24;i++){const d=new Date(2026,6+i,1);opts.push([d.getFullYear(),d.getMonth()]);}
-  $('#start').innerHTML=opts.map(([y,m])=>`<option value="${y}-${m}" ${y===S.startY&&m===S.startM?'selected':''}>${new Date(y,m,1).toLocaleString('en-AU',{month:'long',year:'numeric'})}</option>`).join('');
+  $('#start').innerHTML=opts.map(([y,m])=>`<option value="${y}-${m}" ${y===S.startY&&m===S.startM?'selected':''}>${new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'})}</option>`).join('');
   $('#annual').value=S.annual;
 }
 
@@ -547,12 +546,19 @@ function renderAll(opts={}){
   const R=compute();
   renderTiles(R);renderChart(R);renderCvc(R);renderFuture(R);
   $('#chartMode').value=S.chartMode||'cash';$('#basis').value=S.basis||'cash';
-  if(!opts.keepGrid)renderGrid(R);else refreshGridTotals(R);
+  if(!opts.keepGrid)renderGrid(R);else updateGridCells(R);
   renderSolver(R);
   if(!opts.keepFunnel)renderFunnel(R);
   if(!opts.keepOffers)renderOffers();
   $('#sketch').hidden=!S.sketch;
   setTab(S.tab||'plan');
+}
+function gapChip(v,g){const d=v-g;const p=g?v/g:1;const c=p>=1?'good':p>=.75?'warn':'bad';return `<span class="chip ${c}">${d>=0?'+':'−'}${fmtK(Math.abs(d))}</span>`;}
+function updateGridCells(R){
+  const set=(id,h)=>{const el=document.getElementById(id);if(el)el.innerHTML=h;};
+  S.offers.forEach(o=>{set('rt-'+o.id,n0(R.ks.reduce((a,k)=>a+units(o.id,k),0)));set('rc-'+o.id,fmt(R.conByOffer[o.id].reduce((a,b)=>a+b,0)));set('rk-'+o.id,fmt(R.byOffer[o.id].reduce((a,b)=>a+b,0)));});
+  R.ks.forEach((k,i)=>{set('fc-'+i,fmt(R.contract[i]));set('fk-'+i,fmt(R.total[i]));set('fg-'+i,gapChip(R.basis[i],R.goals[i]));});
+  set('fcT',fmt(R.sumContract));set('fkT',fmt(R.sumCash));set('fgoalT',fmt(R.sumGoal));set('fgT',gapChip(R.sumBasis,R.sumGoal));
 }
 function refreshGridTotals(R){ // re-render grid but keep focus
   const a=document.activeElement;const id=a&&a.id;const pos=a&&a.selectionStart;
@@ -563,6 +569,8 @@ function setTab(t){S.tab=t;document.querySelectorAll('.tab').forEach(b=>b.setAtt
 
 /* ---------- events ---------- */
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{setTab(b.dataset.tab);save();}));
+$('#grid').addEventListener('mouseup',e=>{const t=e.target;if(t.tagName==='INPUT'&&document.activeElement===t){e.preventDefault();try{t.select();}catch(_){}}});
+$('#grid').addEventListener('focusin',e=>{const t=e.target;if(t.tagName==='INPUT'){setTimeout(()=>{try{t.select();}catch(_){}},0);}});
 $('#grid').addEventListener('input',e=>{
   const el=e.target;if(el.classList.contains('u')){const v=Math.max(0,Math.round(+el.value||0));S.units[el.dataset.o]=S.units[el.dataset.o]||{};if(v)S.units[el.dataset.o][el.dataset.k]=v;else delete S.units[el.dataset.o][el.dataset.k];}
   else if(el.classList.contains('g')){S.goals[el.dataset.k]=Math.max(0,+el.value||0);}
