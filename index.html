@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<!-- AMG Launch Revenue Map v1.5, 25 Sep 2026. USD throughout, typing fix, click selects cell -->
+<!-- AMG Launch Revenue Map v1.7, 3 Oct 2026. Permission $88 front door + $188 container, Baseline $3,333 / $333, Mirror plan, The Mirror Year, Proximity $55,555 -->
 <title>Launch Revenue Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -270,21 +270,25 @@ function starter(){
     {id:'rec',name:'Recognise',group:'front',kind:'once',price:22,source:'Sixteen downloads',rate:8},
     {id:'maps',name:'Sixteen Loop Maps bump',group:'front',kind:'once',price:12,source:'Recognise buyers',rate:30},
     {id:'belief',name:'The Belief List bump',group:'front',kind:'once',price:9,source:'Recognise buyers',rate:25},
-    {id:'perm',name:'Permission',group:'front',kind:'once',price:188,source:'Recognise buyers',rate:20},
+    {id:'perm',name:'Permission',group:'front',kind:'once',price:88,source:'Recognise buyers',rate:20},
+    {id:'permC',name:'Permission',group:'cont',kind:'once',price:188,source:'keyword DMs',rate:15},
     {id:'shift',name:'Shift',group:'cont',kind:'once',price:222,source:'keyword DMs',rate:15},
     {id:'cap',name:'Capacity',group:'cont',kind:'once',price:333,source:'keyword DMs',rate:15},
     {id:'hold',name:'Hold',group:'cont',kind:'once',price:444,source:'keyword DMs',rate:15},
     {id:'sov',name:'Sovereign',group:'cont',kind:'once',price:555,source:'keyword DMs',rate:15},
     {id:'vip',name:'Container VIP',group:'cont',kind:'once',price:888,source:'container buyers',rate:10},
-    {id:'baseA',name:'Baseline annual',group:'base',kind:'once',price:2222,source:'container completers',rate:10},
-    {id:'baseM',name:'Baseline monthly',group:'base',kind:'monthly',price:222,churn:5,existing:5,source:'container completers',rate:20},
-    {id:'mirror',name:'Mirror',group:'mirror',kind:'once',price:8888,source:'DM conversations',rate:25},
+    {id:'baseA',name:'Baseline annual',group:'base',kind:'once',price:3333,source:'container completers',rate:10},
+    {id:'baseM',name:'Baseline monthly',group:'base',kind:'monthly',price:333,churn:5,existing:5,source:'container completers',rate:20},
+    {id:'mirror',name:'Mirror, paid in full',group:'mirror',kind:'once',price:8888,source:'DM conversations',rate:25},
+    {id:'mirrorPl',name:'Mirror, plan',group:'mirror',kind:'plan',price:9332,deposit:4444,inst:2,instAmt:2444,source:'DM conversations',rate:25},
+    {id:'mYear',name:'The Mirror Year, paid in full',group:'mirror',kind:'once',price:11111,source:'DM conversations',rate:25},
+    {id:'mYearPl',name:'The Mirror Year, plan',group:'mirror',kind:'plan',price:12221,deposit:4444,inst:11,instAmt:707,source:'DM conversations',rate:25},
     {id:'heldP',name:'Encompassed Held, paid in full',group:'enc',kind:'once',price:33333,source:'applications',rate:33},
     {id:'heldPl',name:'Encompassed Held, plan',group:'enc',kind:'plan',price:36663,deposit:6666,inst:11,instAmt:2727,source:'applications',rate:33},
-    {id:'proxP',name:'Proximity, paid in full',group:'enc',kind:'once',price:88888,source:'applications',rate:33},
-    {id:'proxPl',name:'Proximity, plan',group:'enc',kind:'plan',price:97769,deposit:17777,inst:11,instAmt:7272,source:'applications',rate:33}
+    {id:'proxP',name:'Proximity, paid in full',group:'enc',kind:'once',price:55555,source:'applications',rate:33},
+    {id:'proxPl',name:'Proximity, plan',group:'enc',kind:'plan',price:61106,deposit:11111,inst:11,instAmt:4545,source:'applications',rate:33}
   ];
-  const s={startY:2026,startM:9,annual:1100000,goals:{},units:{},offers,tab:'plan',sketch:true};
+  const s={startY:2026,startM:9,annual:1100000,goals:{},units:{},offers,tab:'plan',sketch:true,priceVer:3};
   const ks=monthKeys(s);
   const put=(id,arr)=>{s.units[id]={};arr.forEach((v,i)=>{if(v)s.units[id][ks[i]]=v;});};
   //        Oct Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep
@@ -318,6 +322,20 @@ function distribute(s,mode){
 let S;
 try{const raw=localStorage.getItem(KEY);if(raw)S=JSON.parse(raw);}catch(e){}
 if(!S||!S.offers)S=starter();
+// Price update 3 Oct 2026: keeps every sales number already typed in
+if((S.priceVer||1)<2){
+  const fresh=starter().offers;const by=id=>S.offers.find(o=>o.id===id);
+  [['baseA',{price:3333}],['baseM',{price:333}],['mirror',{price:8888,name:'Mirror, paid in full'}],
+   ['proxP',{price:55555}],['proxPl',{price:61106,deposit:11111,inst:11,instAmt:4545}]].forEach(([id,ch])=>{const o=by(id);if(o)Object.assign(o,ch);});
+  let at=S.offers.findIndex(o=>o.id==='mirror');
+  ['mirrorPl','mYear','mYearPl'].forEach(id=>{if(!by(id)){const f=fresh.find(o=>o.id===id);if(at<0)S.offers.push(f);else S.offers.splice(++at,0,f);}});
+  S.priceVer=2;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+}
+if((S.priceVer||1)<3){
+  const p=S.offers.find(o=>o.id==='perm');if(p)p.price=88;
+  if(!S.offers.find(o=>o.id==='permC')){const f=starter().offers.find(o=>o.id==='permC');const at=S.offers.findIndex(o=>o.id==='shift');if(at<0)S.offers.push(f);else S.offers.splice(at,0,f);}
+  S.priceVer=3;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 const $=s=>document.querySelector(s);
